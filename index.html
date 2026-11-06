@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="tk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ATAJAN UC - PUBG Mobile UC Store</title>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+<style>
+:root{--bg-gradient:linear-gradient(135deg,#05070b 0%,#0c1017 50%,#111823 100%);--card-bg:rgba(18,24,33,.85);--card-border:rgba(255,174,0,.25);--card-border-hover:rgba(255,174,0,.8);--text-main:#f8fafc;--text-sub:#94a3b8;--primary-gold:#ffae00;--gold-glow:rgba(255,174,0,.35);--accent-blue:#00d2ff;--accent-red:#ff4757;--accent-green:#2ed573;--input-bg:rgba(10,14,20,.9);--header-bg:rgba(5,7,11,.85);--modal-bg:#0e131d;--shadow-color:rgba(0,0,0,.5)}
+[data-theme="light"]{--bg-gradient:linear-gradient(135deg,#f1f5f9 0%,#e2e8f0 50%,#cbd5e1 100%);--card-bg:rgba(255,255,255,.9);--card-border:rgba(217,119,6,.25);--card-border-hover:rgba(217,119,6,.7);--text-main:#0f172a;--text-sub:#64748b;--primary-gold:#d97706;--gold-glow:rgba(217,119,6,.25);--accent-blue:#0284c7;--accent-red:#dc2626;--accent-green:#16a34a;--input-bg:rgba(248,250,252,.95);--header-bg:rgba(255,255,255,.85);--modal-bg:#fff;--shadow-color:rgba(15,23,42,.1)}
+*{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;transition:background-color .25s ease,color .25s ease,border-color .25s ease,transform .2s ease,box-shadow .25s ease}
+body{background:var(--bg-gradient);background-attachment:fixed;color:var(--text-main);min-height:100vh;display:flex;flex-direction:column;position:relative;overflow-x:hidden}
+#bg-canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1;pointer-events:none}
+header{background:var(--header-bg);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid var(--card-border);padding:14px 24px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;position:sticky;top:0;z-index:100;box-shadow:0 4px 30px var(--shadow-color)}
+.brand{display:flex;align-items:center;gap:10px;font-size:1.6rem;font-weight:900;color:var(--primary-gold);cursor:pointer;text-shadow:0 0 15px var(--gold-glow);letter-spacing:.5px}
+.brand i{animation:boltPulse 2.4s ease-in-out infinite}
+@keyframes boltPulse{0%,100%{transform:scale(1);filter:drop-shadow(0 0 2px var(--gold-glow))}50%{transform:scale(1.18);filter:drop-shadow(0 0 10px var(--primary-gold))}}
+.nav-controls{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.btn-icon{background:var(--input-bg);border:1px solid var(--card-border);color:var(--text-main);padding:9px 14px;border-radius:10px;cursor:pointer;font-size:.95rem;display:flex;align-items:center;gap:8px;font-weight:600;box-shadow:0 2px 8px var(--shadow-color)}
+.btn-icon:hover{border-color:var(--primary-gold);color:var(--primary-gold);transform:translateY(-2px)}
+.cart-badge{background:var(--accent-red);color:#fff;font-size:.75rem;border-radius:50%;padding:2px 7px;font-weight:700}
+.cart-badge.bump{animation:bump .4s}
+@keyframes bump{50%{transform:scale(1.6)}}
+select.lang-select{background:var(--input-bg);color:var(--text-main);border:1px solid var(--card-border);padding:9px 12px;border-radius:10px;outline:none;cursor:pointer;font-weight:600;box-shadow:0 2px 8px var(--shadow-color)}
+.status-banner{background:rgba(255,71,87,.15);border-bottom:1px solid var(--accent-red);color:var(--accent-red);text-align:center;padding:12px;font-weight:700;display:none;backdrop-filter:blur(8px)}
+.status-banner.active{display:block}
+.container{max-width:1200px;margin:30px auto;padding:0 20px;flex:1;width:100%}
+.section-title{font-size:1.8rem;margin-bottom:25px;text-align:center;display:flex;align-items:center;justify-content:center;gap:12px;font-weight:800;letter-spacing:.5px}
+.uc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:24px;margin-bottom:40px}
+.uc-card{background:var(--card-bg);backdrop-filter:blur(12px);border:1px solid var(--card-border);border-radius:20px;padding:24px 20px;text-align:center;position:relative;overflow:hidden;box-shadow:0 10px 30px var(--shadow-color);display:flex;flex-direction:column;align-items:center;opacity:0;animation:cardIn .6s cubic-bezier(.2,.8,.2,1) forwards;animation-delay:calc(var(--i)*90ms)}
+@keyframes cardIn{from{opacity:0;transform:translateY(30px) scale(.94)}to{opacity:1;transform:none}}
+.uc-card::before{content:'';position:absolute;top:0;left:0;width:100%;height:4px;background:linear-gradient(90deg,transparent,var(--primary-gold),transparent);opacity:0;transition:opacity .3s ease}
+.uc-card::after{content:'';position:absolute;top:0;left:-80%;width:50%;height:100%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.12),transparent);transform:skewX(-20deg);animation:shine 5s ease-in-out infinite;animation-delay:calc(var(--i)*.6s);pointer-events:none}
+@keyframes shine{0%,60%{left:-80%}100%{left:140%}}
+.uc-card:hover{transform:translateY(-6px);border-color:var(--card-border-hover);box-shadow:0 15px 35px var(--gold-glow)}
+.uc-card:hover::before{opacity:1}
+.uc-img{width:130px;height:130px;margin-bottom:12px;display:flex;align-items:center;justify-content:center;animation:float 3.2s ease-in-out infinite;animation-delay:calc(var(--i)*.35s);filter:drop-shadow(0 8px 14px rgba(255,150,0,.35))}
+.uc-img img,.uc-img svg{width:100%;height:100%;object-fit:contain}
+@keyframes float{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-12px) rotate(2deg)}}
+.uc-amount{font-size:1.7rem;font-weight:900;color:var(--primary-gold);margin-bottom:6px}
+.uc-price{font-size:1.25rem;font-weight:700;color:var(--text-sub);margin-bottom:16px}
+.card-actions{display:flex;gap:10px;width:100%}
+.btn-buy{flex:1;background:linear-gradient(135deg,var(--primary-gold),#ff8800);color:#000;font-weight:800;border:none;padding:12px;border-radius:12px;cursor:pointer;font-size:.95rem;text-transform:uppercase;box-shadow:0 4px 15px var(--gold-glow)}
+.btn-buy:hover{opacity:.9;transform:scale(1.03)}
+.btn-buy:not(.btn-disabled){animation:glow 2.6s ease-in-out infinite}
+@keyframes glow{50%{box-shadow:0 4px 26px var(--primary-gold)}}
+.btn-cart-add{background:var(--input-bg);border:1px solid var(--card-border);color:var(--primary-gold);padding:12px 16px;border-radius:12px;cursor:pointer;font-size:1.1rem}
+.btn-cart-add:hover{background:var(--primary-gold);color:#000;border-color:var(--primary-gold)}
+.btn-disabled{background:#475569!important;color:#94a3b8!important;box-shadow:none!important;cursor:not-allowed!important;transform:none!important;animation:none!important}
+.modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.8);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);display:none;justify-content:center;align-items:center;z-index:1000;padding:20px;overflow-y:auto}
+.modal-card{background:var(--modal-bg);border:1px solid var(--card-border);border-radius:24px;width:100%;max-width:480px;padding:30px;position:relative;box-shadow:0 20px 50px rgba(0,0,0,.6);animation:modalScale .3s cubic-bezier(.175,.885,.32,1.275)}
+@keyframes modalScale{from{transform:scale(.85);opacity:0}to{transform:scale(1);opacity:1}}
+.close-modal{position:absolute;top:20px;right:20px;font-size:1.3rem;color:var(--text-sub);cursor:pointer;width:36px;height:36px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:var(--input-bg);border:1px solid var(--card-border)}
+.close-modal:hover{color:var(--accent-red);border-color:var(--accent-red);background:rgba(255,71,87,.1)}
+.form-group{margin-bottom:18px}
+.form-group label{display:block;margin-bottom:8px;font-size:.9rem;color:var(--text-sub);font-weight:600}
+.form-group input,.inline-input{width:100%;background:var(--input-bg);border:1px solid var(--card-border);padding:12px 16px;border-radius:12px;color:var(--text-main);font-size:1rem;outline:none}
+.form-group input:focus,.inline-input:focus{border-color:var(--primary-gold);box-shadow:0 0 10px var(--gold-glow)}
+.err{color:var(--accent-red);display:none;margin-top:6px;font-weight:600;font-size:.85rem}
+.payment-info-box{background:rgba(255,174,0,.08);border:1px dashed var(--primary-gold);padding:16px;border-radius:14px;margin-bottom:20px;text-align:center}
+.payment-number{font-size:1.4rem;font-weight:900;color:var(--primary-gold);letter-spacing:1px;margin-top:6px}
+.admin-panel{display:none}
+.panel-card{background:var(--card-bg);backdrop-filter:blur(12px);border:1px solid var(--card-border);border-radius:20px;padding:24px;margin-bottom:25px;box-shadow:0 10px 30px var(--shadow-color)}
+.panel-title{font-size:1.3rem;font-weight:800;margin-bottom:18px;color:var(--primary-gold);display:flex;align-items:center;gap:10px}
+table{width:100%;border-collapse:collapse;margin-top:10px}
+th,td{padding:12px 14px;text-align:left;border-bottom:1px solid var(--card-border);font-size:.95rem;white-space:nowrap}
+th{color:var(--text-sub);font-weight:700;background:var(--input-bg)}
+.status-badge{padding:4px 10px;border-radius:20px;font-size:.75rem;font-weight:800;display:inline-block}
+.badge-pending{background:rgba(255,174,0,.15);color:#ffae00;border:1px solid rgba(255,174,0,.3)}
+.badge-success{background:rgba(46,213,115,.15);color:#2ed573;border:1px solid rgba(46,213,115,.3)}
+.badge-rejected{background:rgba(255,71,87,.15);color:#ff4757;border:1px solid rgba(255,71,87,.3)}
+.btn-action{padding:6px 12px;border-radius:8px;border:none;cursor:pointer;font-size:.85rem;font-weight:700;margin-right:6px}
+.btn-approve{background:var(--accent-green);color:#000}.btn-reject{background:var(--accent-red);color:#fff}.btn-delete{background:#64748b;color:#fff}
+.btn-action:hover{opacity:.85;transform:scale(1.05)}
+.switch-container{display:flex;align-items:center;gap:15px}
+.switch{position:relative;display:inline-block;width:52px;height:28px}
+.switch input{opacity:0;width:0;height:0}
+.slider{position:absolute;cursor:pointer;inset:0;background-color:#475569;transition:.3s;border-radius:34px}
+.slider:before{position:absolute;content:"";height:20px;width:20px;left:4px;bottom:4px;background:#fff;transition:.3s;border-radius:50%}
+input:checked+.slider{background-color:var(--accent-green)}
+input:checked+.slider:before{transform:translateX(24px)}
+.grid-2{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px}
+.role-select-box{display:flex;gap:15px;margin-top:20px}
+.role-card{flex:1;border:1px solid var(--card-border);background:var(--input-bg);border-radius:16px;padding:20px 15px;cursor:pointer;text-align:center;box-shadow:0 4px 15px var(--shadow-color)}
+.role-card:hover{border-color:var(--primary-gold);background:rgba(255,174,0,.08);transform:translateY(-4px)}
+.role-card i{font-size:2.2rem;color:var(--primary-gold);margin-bottom:10px}
+.toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%) translateY(30px);background:var(--modal-bg);color:var(--text-main);border:1px solid var(--primary-gold);padding:12px 20px;border-radius:14px;font-weight:700;opacity:0;z-index:2000;pointer-events:none;box-shadow:0 8px 30px var(--shadow-color)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+@media(max-width:600px){header{padding:12px 14px}.brand{font-size:1.3rem}.btn-icon span:not(.cart-badge){font-size:.85rem}.modal-card{padding:22px}.role-select-box{flex-direction:column}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important}.uc-card{opacity:1}}
+
+</style>
+</head>
+<body data-theme="dark">
+<canvas id="bg-canvas"></canvas>
+
+<div class="modal-overlay" id="roleModal" style="display:flex">
+  <div class="modal-card" style="max-width:440px;text-align:center">
+    <div style="font-size:2rem;font-weight:900;color:var(--primary-gold);margin-bottom:10px;text-shadow:0 0 15px var(--gold-glow)"><i class="fa-solid fa-gamepad"></i> ATAJAN UC</div>
+    <p style="color:var(--text-sub);font-size:.95rem" data-i18n="roleAsk"></p>
+    <div class="role-select-box">
+      <div class="role-card" onclick="chooseRole('buyer')"><i class="fa-solid fa-cart-shopping"></i><div style="font-weight:800" data-i18n="roleBuyer"></div><small style="color:var(--text-sub)" data-i18n="roleBuyerSub"></small></div>
+      <div class="role-card" onclick="chooseRole('owner')"><i class="fa-solid fa-user-shield"></i><div style="font-weight:800" data-i18n="roleOwner"></div><small style="color:var(--text-sub)" data-i18n="roleOwnerSub"></small></div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="regModal">
+  <div class="modal-card" style="max-width:400px">
+    <i class="fa-solid fa-xmark close-modal" onclick="closeModal('regModal')"></i>
+    <div class="panel-title"><i class="fa-solid fa-user-plus"></i> <span data-i18n="regTitle"></span></div>
+    <div class="form-group"><label data-i18n="name"></label><input type="text" id="regName" maxlength="60"></div>
+    <div class="form-group"><label data-i18n="phone"></label><input type="tel" id="regPhone" placeholder="+99365123456" maxlength="25"><small class="err" id="regErr" data-i18n="phoneErr"></small></div>
+    <button class="btn-buy" onclick="submitRegistration()" data-i18n="enter"></button>
+  </div>
+</div>
+
+<header>
+  <div class="brand" onclick="showShop()"><i class="fa-solid fa-bolt"></i> ATAJAN UC</div>
+  <div class="nav-controls">
+    <button class="btn-icon" onclick="openCart()"><i class="fa-solid fa-cart-shopping"></i><span class="cart-badge" id="cartCount">0</span></button>
+    <button class="btn-icon" onclick="toggleTheme()"><i class="fa-solid fa-moon" id="themeIcon"></i><span id="themeLbl"></span></button>
+    <select class="lang-select" id="langSelect" onchange="setLang(this.value)">
+      <option value="tk">Türkmen</option><option value="ru">Русский</option><option value="en">English</option>
+    </select>
+    <button class="btn-icon" onclick="toggleOwner()"><i class="fa-solid fa-user-shield"></i><span id="ownerBtnLbl"></span></button>
+  </div>
+</header>
+
+<div class="status-banner" id="closedBanner"><i class="fa-solid fa-triangle-exclamation"></i> <span data-i18n="closedMsg"></span></div>
+
+<div class="container">
+  <div id="shopSection">
+    <div class="section-title"><i class="fa-solid fa-gem" style="color:var(--primary-gold)"></i><span data-i18n="shopTitle"></span></div>
+    <div class="uc-grid" id="ucGrid"></div>
+    <div class="panel-card" style="margin-top:35px">
+      <div class="panel-title"><i class="fa-solid fa-clock-rotate-left"></i><span data-i18n="history"></span></div>
+      <div style="overflow-x:auto"><table><thead><tr><th data-i18n="thDate"></th><th data-i18n="thUc"></th><th data-i18n="thId"></th><th data-i18n="thStatus"></th></tr></thead><tbody id="buyerBody"></tbody></table></div>
+    </div>
+  </div>
+
+  <div id="adminSection" class="admin-panel">
+    <div class="section-title"><i class="fa-solid fa-user-gear" style="color:var(--primary-gold)"></i><span data-i18n="adminTitle"></span></div>
+    <div class="grid-2">
+      <div class="panel-card">
+        <div class="panel-title"><i class="fa-solid fa-toggle-on"></i><span data-i18n="storeStatus"></span></div>
+        <div class="switch-container"><label class="switch"><input type="checkbox" id="shopToggle" onchange="toggleShop(this.checked)"><span class="slider"></span></label><span id="shopLbl" style="font-weight:800;font-size:1.15rem"></span></div>
+      </div>
+      <div class="panel-card">
+        <div class="panel-title"><i class="fa-solid fa-mobile-retro"></i><span data-i18n="payNum"></span></div>
+        <div style="display:flex;gap:10px"><input type="text" id="payInput" class="inline-input" style="flex:1"><button class="btn-icon" style="background:var(--accent-green);color:#000;border:none" onclick="savePayment()" data-i18n="save"></button></div>
+      </div>
+    </div>
+    <div class="grid-2">
+      <div class="panel-card">
+        <div class="panel-title"><i class="fa-solid fa-key"></i><span data-i18n="credTitle"></span></div>
+        <div class="form-group"><label data-i18n="newUser"></label><input type="text" id="newUser" autocomplete="off"></div>
+        <div class="form-group"><label data-i18n="newPass"></label><input type="password" id="newPass" autocomplete="new-password"></div>
+        <button class="btn-buy" onclick="saveCreds()" data-i18n="saveCred"></button>
+      </div>
+      <div class="panel-card">
+        <div class="panel-title"><i class="fa-solid fa-tags"></i><span data-i18n="editPrices"></span></div>
+        <div id="priceList"></div>
+        <button class="btn-buy" style="margin-top:12px" onclick="savePrices()" data-i18n="savePrices"></button>
+      </div>
+    </div>
+    <div class="panel-card">
+      <div class="panel-title"><i class="fa-solid fa-users"></i><span data-i18n="visitors"></span></div>
+      <div style="overflow-x:auto"><table><thead><tr><th data-i18n="thName"></th><th data-i18n="thPhone"></th><th data-i18n="thTime"></th></tr></thead><tbody id="visitorsBody"></tbody></table></div>
+    </div>
+    <div class="panel-card">
+      <div class="panel-title"><i class="fa-solid fa-list-check"></i><span data-i18n="ordersList"></span></div>
+      <div style="overflow-x:auto"><table><thead><tr><th>ID</th><th data-i18n="thNum"></th><th>PUBG ID</th><th>UC</th><th data-i18n="thPrice"></th><th data-i18n="thShot"></th><th data-i18n="thStatus"></th><th data-i18n="thActions"></th></tr></thead><tbody id="adminBody"></tbody></table></div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="cartModal"><div class="modal-card">
+  <i class="fa-solid fa-xmark close-modal" onclick="closeModal('cartModal')"></i>
+  <div class="panel-title"><i class="fa-solid fa-cart-shopping"></i><span data-i18n="cart"></span></div>
+  <div id="cartList" style="margin-bottom:20px;max-height:250px;overflow-y:auto"></div>
+  <div style="font-size:1.15rem;font-weight:700;margin-bottom:18px;display:flex;justify-content:space-between"><span data-i18n="total"></span><span id="cartTotal" style="color:var(--primary-gold)">0 TMT</span></div>
+  <button class="btn-buy" onclick="checkoutCart()" data-i18n="checkout"></button>
+</div></div>
+
+<div class="modal-overlay" id="orderModal"><div class="modal-card">
+  <i class="fa-solid fa-xmark close-modal" onclick="closeModal('orderModal')"></i>
+  <div class="panel-title"><i class="fa-solid fa-cart-arrow-down"></i><span data-i18n="orderTitle"></span></div>
+  <div class="payment-info-box">
+    <div style="font-size:.9rem;color:var(--text-sub)" data-i18n="payInstr"></div>
+    <div class="payment-number" id="orderPhone"></div>
+    <div style="margin-top:6px;font-weight:700;color:var(--primary-gold);font-size:1.1rem" id="orderSummary"></div>
+  </div>
+  <div class="form-group"><label data-i18n="pubgId"></label><input type="text" id="pubgId" inputmode="numeric" placeholder="5XXXXXXXXX" maxlength="15"></div>
+  <div class="form-group"><label data-i18n="shot"></label><input type="file" id="shotFile" accept="image/png,image/jpeg,image/webp" style="padding:8px"></div>
+  <button class="btn-buy" id="submitBtn" onclick="submitOrder()" data-i18n="submit"></button>
+</div></div>
+
+<div class="modal-overlay" id="loginModal"><div class="modal-card" style="max-width:380px">
+  <i class="fa-solid fa-xmark close-modal" onclick="closeModal('loginModal')"></i>
+  <div class="panel-title"><i class="fa-solid fa-lock"></i><span data-i18n="ownerLogin"></span></div>
+  <div class="form-group"><label data-i18n="user"></label><input type="text" id="loginUser" autocomplete="username"></div>
+  <div class="form-group"><label data-i18n="pass"></label><input type="password" id="loginPass" autocomplete="current-password"></div>
+  <button class="btn-buy" onclick="doLogin()" data-i18n="loginBtn"></button>
+</div></div>
+
+<div class="modal-overlay" id="imgModal"><div class="modal-card" style="max-width:550px;text-align:center">
+  <i class="fa-solid fa-xmark close-modal" onclick="closeModal('imgModal')"></i>
+  <div class="panel-title"><i class="fa-solid fa-image"></i><span data-i18n="proof"></span></div>
+  <img id="previewImg" src="" alt="" style="max-width:100%;max-height:420px;border-radius:12px;border:1px solid var(--card-border);object-fit:contain">
+</div></div>
+
+<div class="toast" id="toast"></div>
+<script>
+const LANG = {
+tk:{roleAsk:"Ulgama kim hökmünde girmek isleýärsiňiz?",roleBuyer:"Sargyt Ediji",roleBuyerSub:"UC Satyn Almak",roleOwner:"Owner (Admin)",roleOwnerSub:"Dolandyryş Paneli",
+regTitle:"Sargyt Ediji Giriş",name:"Adyňyz:",phone:"Telefon Nomeriňiz (+9936XXXXXXX):",phoneErr:"Ady we nomeri dogry giriziň!",enter:"Girmek",
+shopTitle:"PUBG Mobile UC Paketleri",buy:"SATYN AL",history:"Siziň Sargyt Taryhyňyz",thDate:"Sena",thUc:"UC Mukdary",thId:"PUBG ID",thStatus:"Ýagdaýy",
+noOrders:"Sargytlaryňyz ýok.",notLogged:"Ulgama girilmedi.",closedMsg:"Häzirki wagtda sargyt kabul edilmeýär! Dükan wagtlaýyn ýapyk.",
+cart:"Sebediňiz",cartEmpty:"Sebediňiz boş.",total:"Jemi:",checkout:"Sebet Sargydyny Tassykla",cartAdded:"sebede goşuldy!",
+orderTitle:"Sargyt Tassyklaýyş",payInstr:"Aşakdaky telefona tölegi geçiriň we skrinşot ýükleň:",pubgId:"PUBG Mobile ID:",shot:"Töleg Skrinşoty (Subutnoma):",submit:"Sargydy Iber",
+enterPubg:"PUBG ID-ni dogry giriziň (diňe sanlar)!",orderSent:"Sargydyňyz üstünlikli iberildi!",closedErr:"Dükan ýapyk!",netErr:"Serwer bilen baglanyşyk ýok!",
+ownerLogin:"Owner Login",logout:"Çykyş",user:"Login:",pass:"Parol:",loginBtn:"Ulgama Gir",wrongLogin:"Nätogry Login ýa-da Parol!",tooMany:"Köp synanyşyk. 5 minut garaşyň.",
+adminTitle:"Owner Başky Dolandyryş Paneli",storeStatus:"Dükan Ýagdaýy",open:"AÇYK",closed:"ÝAPYK",payNum:"Pul Geçirilmeli Nomer",save:"Ýatda Sakla",saved:"Ýatda saklandy!",
+credTitle:"Owner Login we Parol Sazlamasy",newUser:"Täze Login:",newPass:"Täze Parol (iň az 6):",saveCred:"Gözden Geçir & Sakla",
+editPrices:"UC Bahalaryny Üýtgetmek",savePrices:"Bahalary Sakla",visitors:"Ulgama Giren Alyjylar Sanawy",ordersList:"Gelýän Sargytlar Sanawy",
+thName:"Ady",thPhone:"Telefon Nomeri",thTime:"Giren Wagty",thNum:"Nomer",thPrice:"Baha",thShot:"Skrinşot",thActions:"Amallar",view:"Gör",none:"Ýok",
+noVisitors:"Häzirlikçe giren ýok.",noIncoming:"Gelip gowşan sargyt ýok.",delConfirm:"Sargydy pozmak isleýärsiňizmi?",proof:"Töleg Subutnamasy",
+pending:"Garaşylýar",approved:"UC Geçdi",rejected:"Ýatyrgyldy",light:"Ak",dark:"Gije"},
+ru:{roleAsk:"Как вы хотите войти в систему?",roleBuyer:"Покупатель",roleBuyerSub:"Купить UC",roleOwner:"Владелец (Админ)",roleOwnerSub:"Панель управления",
+regTitle:"Вход покупателя",name:"Ваше имя:",phone:"Ваш номер телефона (+9936XXXXXXX):",phoneErr:"Введите правильно имя и номер!",enter:"Войти",
+shopTitle:"Пакеты PUBG Mobile UC",buy:"КУПИТЬ",history:"Ваша История Заказов",thDate:"Дата",thUc:"Кол-во UC",thId:"PUBG ID",thStatus:"Статус",
+noOrders:"Нет заказов.",notLogged:"Вы не вошли.",closedMsg:"В настоящее время заказы не принимаются! Магазин закрыт.",
+cart:"Ваша корзина",cartEmpty:"Корзина пуста.",total:"Итого:",checkout:"Оформить заказ из корзины",cartAdded:"добавлено в корзину!",
+orderTitle:"Подтверждение Заказа",payInstr:"Переведите оплату на номер ниже и загрузите скриншот:",pubgId:"PUBG Mobile ID:",shot:"Скриншот Оплаты:",submit:"Отправить Заказ",
+enterPubg:"Введите правильный PUBG ID (только цифры)!",orderSent:"Ваш заказ успешно отправлен!",closedErr:"Магазин закрыт!",netErr:"Нет связи с сервером!",
+ownerLogin:"Вход Владельца",logout:"Выход",user:"Логин:",pass:"Пароль:",loginBtn:"Войти",wrongLogin:"Неверный логин или пароль!",tooMany:"Слишком много попыток. Подождите 5 минут.",
+adminTitle:"Панель Управления Владельца",storeStatus:"Статус Магазина",open:"ОТКРЫТ",closed:"ЗАКРЫТ",payNum:"Номер для Оплаты",save:"Сохранить",saved:"Сохранено!",
+credTitle:"Настройки Логина и Пароля",newUser:"Новый Логин:",newPass:"Новый Пароль (мин. 6):",saveCred:"Обновить Данные",
+editPrices:"Изменение Цен UC",savePrices:"Сохранить Цены",visitors:"Список Вошедших Покупателей",ordersList:"Список Заказов",
+thName:"Имя",thPhone:"Телефон",thTime:"Время входа",thNum:"Номер",thPrice:"Цена",thShot:"Скриншот",thActions:"Действия",view:"Смотреть",none:"Нет",
+noVisitors:"Пока никто не входил.",noIncoming:"Заказов пока нет.",delConfirm:"Удалить заказ?",proof:"Подтверждение оплаты",
+pending:"Ожидает",approved:"UC зачислены",rejected:"Отклонён",light:"Светлая",dark:"Темная"},
+en:{roleAsk:"How would you like to enter?",roleBuyer:"Buyer",roleBuyerSub:"Buy UC",roleOwner:"Owner (Admin)",roleOwnerSub:"Control panel",
+regTitle:"Buyer Sign-in",name:"Your name:",phone:"Your phone (+9936XXXXXXX):",phoneErr:"Enter a valid name and phone!",enter:"Enter",
+shopTitle:"PUBG Mobile UC Packages",buy:"BUY NOW",history:"Your Order History",thDate:"Date",thUc:"UC Amount",thId:"PUBG ID",thStatus:"Status",
+noOrders:"No orders found.",notLogged:"Not signed in.",closedMsg:"Orders are currently disabled! The store is closed.",
+cart:"Your cart",cartEmpty:"Your cart is empty.",total:"Total:",checkout:"Checkout cart",cartAdded:"added to cart!",
+orderTitle:"Order Confirmation",payInstr:"Transfer payment to the phone below and upload screenshot:",pubgId:"PUBG Mobile ID:",shot:"Payment Screenshot:",submit:"Submit Order",
+enterPubg:"Enter a valid PUBG ID (digits only)!",orderSent:"Your order was sent!",closedErr:"The store is closed!",netErr:"Cannot reach the server!",
+ownerLogin:"Owner Login",logout:"Logout",user:"Username:",pass:"Password:",loginBtn:"Login",wrongLogin:"Wrong username or password!",tooMany:"Too many attempts. Wait 5 minutes.",
+adminTitle:"Owner Control Panel",storeStatus:"Store Status",open:"OPEN",closed:"CLOSED",payNum:"Payment Phone Number",save:"Save",saved:"Saved!",
+credTitle:"Owner Login & Password Settings",newUser:"New Username:",newPass:"New Password (min 6):",saveCred:"Update Credentials",
+editPrices:"Modify UC Prices",savePrices:"Save Prices",visitors:"Visitors & Buyers Log",ordersList:"Incoming Orders",
+thName:"Name",thPhone:"Phone",thTime:"Signed in",thNum:"Number",thPrice:"Price",thShot:"Screenshot",thActions:"Actions",view:"View",none:"None",
+noVisitors:"No visitors yet.",noIncoming:"No orders yet.",delConfirm:"Delete this order?",proof:"Payment proof",
+pending:"Pending",approved:"UC sent",rejected:"Rejected",light:"Light",dark:"Dark"}
+};
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const load = (k, d) => { try { return JSON.parse(localStorage.getItem(k)) ?? d; } catch { return d; } };
+
+let lang = localStorage.getItem('uc_lang') || 'tk';
+let theme = localStorage.getItem('uc_theme') || 'dark';
+let buyer = load('uc_buyer', null);        // {token,name,phone}
+let cart = load('uc_cart', []);            // paket id-leri
+let shop = { isShopOpen: true, paymentPhone: '', packages: [] };
+let adminToken = null, adminData = null, orderIds = [];
+const t = k => LANG[lang][k] ?? k;
+
+// ---------- API ----------
+async function remoteApi(url, method = 'GET', body) {
+  const h = { 'Content-Type': 'application/json' };
+  if (buyer) h['x-buyer-token'] = buyer.token;
+  if (adminToken) h['x-admin-token'] = adminToken;
+  let r;
+  try { r = await fetch(API_URL + url, { method, headers: h, body: body ? JSON.stringify(body) : undefined }); }
+  catch { toast(t('netErr')); throw new Error('net'); }
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok) { const e = new Error(j.error || 'error'); e.status = r.status; throw e; }
+  return j;
+}
+function toast(msg) {
+  const el = $('toast'); el.textContent = msg; el.classList.add('show');
+  clearTimeout(toast.t); toast.t = setTimeout(() => el.classList.remove('show'), 2600);
+}
+const openModal = id => $(id).style.display = 'flex';
+const closeModal = id => $(id).style.display = 'none';
+const fmtDate = iso => new Date(iso).toLocaleString();
+
+
+// ================= SAZLAMALAR =================
+// Faýl hökmünde açylsa: sahypa ýeke özi işleýär, maglumatlar şu brauzerde saklanýar.
+// Serwerden (https) açylsa: API_URL boş goýuň, özi şol serwere birigýär.
+// Hakyky serwer bilen işletmek üçin: const API_URL = 'https://siziň-serwer.onrender.com';
+const API_URL = '';
+// Öz UC suratlaryňyz: { 60: 'https://.../uc60.png', 325: '...' }  (boş bolsa SVG görkezilýär)
+const UC_IMAGES = {};
+const LOCAL = !API_URL && !/^https?:$/.test(location.protocol); // serwerden açylsa serwer rejimi, faýl bolup açylsa brauzer rejimi
+
+// ---------- Brauzer rejimi (serwersiz) ----------
+const DB_KEY = 'uc_localdb_v1';
+function ldb() {
+  if (!ldb.d) {
+    try { ldb.d = JSON.parse(localStorage.getItem(DB_KEY)); } catch {}
+    if (!ldb.d) ldb.d = { isShopOpen: true, paymentPhone: '+993 65 123456', admin: { user: 'atajan', pass: 'atajan1066' },
+      packages: [[60,15],[325,70],[660,130],[1800,340],[3850,700],[8100,1400]].map(([a,p],i)=>({id:i+1,amount:a,price:p})),
+      orders: [], visitors: [], buyers: {} };
+  }
+  return ldb.d;
+}
+function lsave() { try { localStorage.setItem(DB_KEY, JSON.stringify(ldb.d)); } catch { toast('Storage full'); } }
+function lerr(status, msg) { const e = new Error(msg); e.status = status; return e; }
+let localAdmin = null;
+async function localApi(url, method = 'GET', b) {
+  b = b || {}; const d = ldb(); let m;
+  const needAdmin = () => { if (!adminToken || adminToken !== localAdmin) throw lerr(401, 'unauthorized'); };
+  const needBuyer = () => { const u = buyer && d.buyers[buyer.token]; if (!u) throw lerr(401, 'login_required'); return u; };
+  const out = v => JSON.parse(JSON.stringify(v));
+  if (url === '/api/state') return out({ isShopOpen: d.isShopOpen, paymentPhone: d.paymentPhone, packages: d.packages });
+  if (url === '/api/register') {
+    const name = String(b.name || '').trim().slice(0, 60), phone = String(b.phone || '').trim();
+    const c = phone.replace(/[^0-9+]/g, '');
+    if (!name || c.length < 8 || c.length > 15) throw lerr(400, 'bad_input');
+    const token = crypto.randomUUID ? crypto.randomUUID() : String(Math.random()).slice(2) + Date.now();
+    d.buyers[token] = { name, phone }; d.visitors.unshift({ name, phone, time: new Date().toISOString() }); lsave();
+    return { token, name, phone };
+  }
+  if (url === '/api/my-orders') { const u = needBuyer(); return out(d.orders.filter(o => o.phone === u.phone).map(o => ({ id: o.id, date: o.date, ucAmount: o.ucAmount, pubgId: o.pubgId, status: o.status }))); }
+  if (url === '/api/orders') {
+    const u = needBuyer(); if (!d.isShopOpen) throw lerr(403, 'closed');
+    const pubgId = String(b.pubgId || '').trim();
+    if (!/^[0-9]{5,15}$/.test(pubgId) || !(b.ids || []).length) throw lerr(400, 'bad_input');
+    let uc = 0, price = 0;
+    for (const id of b.ids) { const p = d.packages.find(x => x.id === Number(id)); if (!p) throw lerr(400, 'bad_package'); uc += p.amount; price += p.price; }
+    d.orders.unshift({ id: Date.now(), name: u.name, phone: u.phone, pubgId, ucAmount: uc, price, shot: b.screenshot || '', status: 'pending', date: new Date().toISOString() });
+    lsave(); return { ok: true };
+  }
+  if (url === '/api/admin/login') {
+    if (b.username === d.admin.user && b.password === d.admin.pass) { localAdmin = 'local-' + Date.now(); return { token: localAdmin }; }
+    throw lerr(401, 'wrong');
+  }
+  needAdmin();
+  if (url === '/api/admin/data') return out({ isShopOpen: d.isShopOpen, paymentPhone: d.paymentPhone, packages: d.packages, username: d.admin.user, visitors: d.visitors,
+    orders: d.orders.map(o => ({ ...o, hasShot: !!o.shot, shot: undefined })) });
+  if (url === '/api/admin/shop') { d.isShopOpen = !!b.isOpen; lsave(); return { ok: true }; }
+  if (url === '/api/admin/payment') { if (!b.phone) throw lerr(400, 'bad_input'); d.paymentPhone = b.phone; lsave(); return { ok: true }; }
+  if (url === '/api/admin/credentials') { if (!b.username || String(b.password).length < 6) throw lerr(400, 'weak'); d.admin = { user: b.username, pass: b.password }; lsave(); return { ok: true }; }
+  if (url === '/api/admin/prices') { d.packages.forEach(p => { const v = Number(b.prices[p.id]); if (v > 0) p.price = v; }); lsave(); return { ok: true }; }
+  if ((m = url.match(/^\/api\/admin\/orders\/(\d+)\/status$/))) { const o = d.orders.find(x => x.id === Number(m[1])); if (!o) throw lerr(400, 'bad_input'); o.status = b.status; lsave(); return { ok: true }; }
+  if ((m = url.match(/^\/api\/admin\/orders\/(\d+)$/)) && method === 'DELETE') { d.orders = d.orders.filter(x => x.id !== Number(m[1])); lsave(); return { ok: true }; }
+  if ((m = url.match(/^\/api\/admin\/shot\/(\d+)$/))) { const o = d.orders.find(x => x.id === Number(m[1])); return { dataUrl: o ? o.shot : '' }; }
+  throw lerr(404, 'not_found');
+}
+async function api(url, method, body) { return LOCAL ? localApi(url, method, body) : remoteApi(url, method, body); }
+
+// Suraty kiçeldip ugratmak (brauzer ýady we internet tygşytlanýar)
+function compressImg(file) {
+  return new Promise((res, rej) => {
+    const img = new Image(), url = URL.createObjectURL(file);
+    img.onload = () => { const k = Math.min(1, 900 / Math.max(img.width, img.height)), c = document.createElement('canvas');
+      c.width = img.width * k; c.height = img.height * k; c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+      URL.revokeObjectURL(url); res(c.toDataURL('image/jpeg', .7)); };
+    img.onerror = rej; img.src = url;
+  });
+}
+
+// ---------- UC suratlary ----------
+// Hakyky suraty goýmak üçin: public/images/uc60.png, uc325.png ... (bolmasa SVG görkezilýär)
+function ucSvg(amount) {
+  const n = amount <= 60 ? 1 : amount <= 325 ? 2 : amount <= 660 ? 3 : amount <= 1800 ? 4 : amount <= 3850 ? 5 : 6;
+  let s = `<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="g${amount}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffe27a"/><stop offset=".5" stop-color="#ffae00"/><stop offset="1" stop-color="#d97706"/></linearGradient></defs>`;
+  for (let i = 0; i < n; i++) {
+    const y = 100 - i * 13;
+    s += `<ellipse cx="60" cy="${y + 8}" rx="34" ry="13" fill="#9a5a00"/><rect x="26" y="${y}" width="68" height="8" fill="#e08a00"/><ellipse cx="60" cy="${y}" rx="34" ry="13" fill="url(#g${amount})" stroke="#fff3b0" stroke-width="1.5"/>`;
+  }
+  const ty = 100 - (n - 1) * 13;
+  s += `<text x="60" y="${ty + 5}" text-anchor="middle" font-family="Arial Black,Arial" font-weight="900" font-size="16" fill="#7a4300">UC</text></svg>`;
+  return s;
+}
+function ucImg(amount) {
+  return UC_IMAGES[amount] ? `<img src="${esc(UC_IMAGES[amount])}" alt="${amount} UC" onerror="this.outerHTML=ucSvg(${amount})">` : ucSvg(amount);
+}
+
+// ---------- Dil / tema ----------
+function applyLang() {
+  document.documentElement.lang = lang;
+  document.querySelectorAll('[data-i18n]').forEach(el => el.textContent = t(el.dataset.i18n));
+  $('langSelect').value = lang;
+  $('themeLbl').textContent = theme === 'light' ? t('light') : t('dark');
+  $('ownerBtnLbl').textContent = adminToken ? t('logout') : t('ownerLogin');
+  $('shopLbl').textContent = shop.isShopOpen ? t('open') : t('closed');
+  renderShop(); renderBuyer(); if (adminToken && adminData) renderAdmin();
+}
+function setLang(l) { lang = l; localStorage.setItem('uc_lang', l); applyLang(); }
+function applyTheme() {
+  document.body.setAttribute('data-theme', theme);
+  $('themeIcon').className = theme === 'light' ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+  $('themeLbl').textContent = theme === 'light' ? t('light') : t('dark');
+}
+function toggleTheme() { theme = theme === 'dark' ? 'light' : 'dark'; localStorage.setItem('uc_theme', theme); applyTheme(); }
+
+// ---------- Dükan ----------
+async function refreshShop() {
+  try { shop = await api('/api/state'); } catch { return; }
+  renderShop();
+}
+let gridKey = '';
+function renderShop() {
+  $('closedBanner').classList.toggle('active', !shop.isShopOpen);
+  const key = JSON.stringify([shop.packages, shop.isShopOpen, lang]);
+  if (key === gridKey) return; gridKey = key;
+  const off = !shop.isShopOpen;
+  $('ucGrid').innerHTML = shop.packages.map((p, i) => `
+    <div class="uc-card" style="--i:${i}">
+      <div class="uc-img">${ucImg(p.amount)}</div>
+      <div class="uc-amount">${p.amount} UC</div>
+      <div class="uc-price">${p.price} TMT</div>
+      <div class="card-actions">
+        <button class="btn-buy ${off ? 'btn-disabled' : ''}" ${off ? 'disabled' : ''} onclick="openOrder([${p.id}])">${t('buy')}</button>
+        <button class="btn-cart-add ${off ? 'btn-disabled' : ''}" ${off ? 'disabled' : ''} onclick="addToCart(${p.id})"><i class="fa-solid fa-cart-plus"></i></button>
+      </div>
+    </div>`).join('');
+}
+function showShop() { $('adminSection').style.display = 'none'; $('shopSection').style.display = 'block'; }
+
+// ---------- Giriş (alyjy) ----------
+function chooseRole(role) {
+  closeModal('roleModal');
+  if (role === 'owner') return openModal('loginModal');
+  if (!buyer) openModal('regModal');
+}
+async function submitRegistration() {
+  const name = $('regName').value.trim(), phone = $('regPhone').value.trim();
+  try {
+    buyer = await api('/api/register', 'POST', { name, phone });
+    localStorage.setItem('uc_buyer', JSON.stringify(buyer));
+    $('regErr').style.display = 'none'; closeModal('regModal'); refreshBuyer();
+  } catch (e) { if (e.message !== 'net') $('regErr').style.display = 'block'; }
+}
+
+// ---------- Sebet / sargyt ----------
+const pkg = id => shop.packages.find(p => p.id === id);
+function saveCart() { localStorage.setItem('uc_cart', JSON.stringify(cart)); $('cartCount').textContent = cart.length; }
+function addToCart(id) {
+  if (!shop.isShopOpen) return;
+  cart.push(id); saveCart();
+  $('cartCount').classList.remove('bump'); void $('cartCount').offsetWidth; $('cartCount').classList.add('bump');
+  toast(`${pkg(id).amount} UC ${t('cartAdded')}`);
+}
+function openCart() {
+  cart = cart.filter(pkg); saveCart();
+  let total = 0;
+  $('cartList').innerHTML = cart.length ? cart.map((id, i) => {
+    const p = pkg(id); total += p.price;
+    return `<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--card-border)"><span><b>${p.amount} UC</b> - ${p.price} TMT</span><i class="fa-solid fa-trash" style="color:var(--accent-red);cursor:pointer;padding:6px" onclick="removeFromCart(${i})"></i></div>`;
+  }).join('') : `<p style="text-align:center;color:var(--text-sub);padding:15px 0">${t('cartEmpty')}</p>`;
+  $('cartTotal').textContent = total + ' TMT';
+  openModal('cartModal');
+}
+function removeFromCart(i) { cart.splice(i, 1); saveCart(); openCart(); }
+function checkoutCart() { if (cart.length) { closeModal('cartModal'); openOrder([...cart]); } }
+function openOrder(ids) {
+  if (!shop.isShopOpen) return;
+  if (!buyer) return openModal('regModal');
+  orderIds = ids;
+  const uc = ids.reduce((a, id) => a + pkg(id).amount, 0), pr = ids.reduce((a, id) => a + pkg(id).price, 0);
+  $('orderPhone').textContent = shop.paymentPhone;
+  $('orderSummary').textContent = `${uc} UC - ${pr} TMT`;
+  openModal('orderModal');
+}
+function readFile(f) {
+  return new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result); r.onerror = rej; r.readAsDataURL(f); });
+}
+async function submitOrder() {
+  const pid = $('pubgId').value.trim();
+  if (!/^[0-9]{5,15}$/.test(pid)) return toast(t('enterPubg'));
+  const btn = $('submitBtn'); btn.disabled = true;
+  try {
+    const f = $('shotFile').files[0];
+    const screenshot = f ? await compressImg(f) : '';
+    await api('/api/orders', 'POST', { pubgId: pid, ids: orderIds, screenshot });
+    if (orderIds.length === cart.length && orderIds.every((x, i) => x === cart[i])) cart = [];
+    saveCart(); $('pubgId').value = ''; $('shotFile').value = '';
+    closeModal('orderModal'); toast(t('orderSent')); refreshBuyer();
+  } catch (e) {
+    if (e.message === 'closed') toast(t('closedErr'));
+    else if (e.status === 401) { buyer = null; localStorage.removeItem('uc_buyer'); closeModal('orderModal'); openModal('regModal'); }
+    else if (e.message !== 'net') toast(t('enterPubg'));
+  } finally { btn.disabled = false; }
+}
+
+// ---------- Alyjynyň taryhy ----------
+let myOrders = [];
+async function refreshBuyer() {
+  if (buyer) { try { myOrders = await api('/api/my-orders'); } catch (e) { if (e.status === 401) { buyer = null; localStorage.removeItem('uc_buyer'); } } }
+  renderBuyer();
+}
+const badge = s => s === 'approved' ? ['badge-success', t('approved')] : s === 'rejected' ? ['badge-rejected', t('rejected')] : ['badge-pending', t('pending')];
+function renderBuyer() {
+  const tb = $('buyerBody');
+  if (!buyer) return tb.innerHTML = `<tr><td colspan="4" style="text-align:center;color:var(--text-sub)">${t('notLogged')}</td></tr>`;
+  if (!myOrders.length) return tb.innerHTML = `<tr><td colspan="4" style="text-align:center;color:var(--text-sub)">${t('noOrders')}</td></tr>`;
+  tb.innerHTML = myOrders.map(o => { const [c, s] = badge(o.status);
+    return `<tr><td>${esc(fmtDate(o.date))}</td><td><b>${esc(o.ucAmount)} UC</b></td><td>${esc(o.pubgId)}</td><td><span class="status-badge ${c}">${s}</span></td></tr>`; }).join('');
+}
+
+// ---------- Owner ----------
+function toggleOwner() {
+  if (adminToken) {
+    adminToken = null; adminData = null; sessionStorage.removeItem('uc_admin');
+    $('adminSection').style.display = 'none'; $('shopSection').style.display = 'block'; applyLang();
+  } else openModal('loginModal');
+}
+async function doLogin() {
+  try {
+    const r = await api('/api/admin/login', 'POST', { username: $('loginUser').value.trim(), password: $('loginPass').value });
+    adminToken = r.token; sessionStorage.setItem('uc_admin', adminToken);
+    $('loginPass').value = ''; closeModal('loginModal'); await enterAdmin();
+  } catch (e) { if (e.message !== 'net') toast(e.status === 429 ? t('tooMany') : t('wrongLogin')); }
+}
+async function enterAdmin() {
+  try { adminData = await api('/api/admin/data'); }
+  catch (e) { adminToken = null; sessionStorage.removeItem('uc_admin'); return; }
+  $('shopSection').style.display = 'none'; $('adminSection').style.display = 'block';
+  $('payInput').value = adminData.paymentPhone; $('newUser').value = adminData.username; $('newPass').value = '';
+  $('priceList').innerHTML = adminData.packages.map(p => `<div style="display:flex;gap:10px;margin-bottom:10px;align-items:center"><span style="width:85px;font-weight:700">${p.amount} UC:</span><input type="number" min="1" class="inline-input" style="padding:8px 12px" id="price-${p.id}" value="${p.price}"><span>TMT</span></div>`).join('');
+  applyLang();
+}
+function renderAdmin() {
+  const d = adminData;
+  $('shopToggle').checked = d.isShopOpen;
+  $('visitorsBody').innerHTML = d.visitors.length ? d.visitors.map(v => `<tr><td><b>${esc(v.name)}</b></td><td>${esc(v.phone)}</td><td>${esc(fmtDate(v.time))}</td></tr>`).join('')
+    : `<tr><td colspan="3" style="text-align:center;color:var(--text-sub)">${t('noVisitors')}</td></tr>`;
+  $('adminBody').innerHTML = d.orders.length ? d.orders.map(o => { const [c, s] = badge(o.status);
+    return `<tr><td>${String(o.id).slice(-4)}</td><td><b>${esc(o.name)}</b><br><small style="color:var(--text-sub)">${esc(o.phone)}</small></td><td><b>${esc(o.pubgId)}</b></td><td>${esc(o.ucAmount)} UC</td><td>${esc(o.price)} TMT</td>
+    <td>${o.hasShot ? `<span style="color:var(--accent-blue);text-decoration:underline;cursor:pointer;font-weight:600" onclick="previewShot(${o.id})">${t('view')}</span>` : `<span style="color:var(--text-sub)">${t('none')}</span>`}</td>
+    <td><span class="status-badge ${c}">${s}</span></td>
+    <td><button class="btn-action btn-approve" onclick="setStatus(${o.id},'approved')"><i class="fa-solid fa-check"></i></button><button class="btn-action btn-reject" onclick="setStatus(${o.id},'rejected')"><i class="fa-solid fa-xmark"></i></button><button class="btn-action btn-delete" onclick="delOrder(${o.id})"><i class="fa-solid fa-trash"></i></button></td></tr>`; }).join('')
+    : `<tr><td colspan="8" style="text-align:center;color:var(--text-sub)">${t('noIncoming')}</td></tr>`;
+}
+async function reloadAdmin() { adminData = await api('/api/admin/data'); renderAdmin(); }
+async function toggleShop(v) { await api('/api/admin/shop', 'POST', { isOpen: v }); shop.isShopOpen = v; await reloadAdmin(); $('shopLbl').textContent = v ? t('open') : t('closed'); renderShop(); }
+async function savePayment() { await api('/api/admin/payment', 'POST', { phone: $('payInput').value.trim() }); toast(t('saved')); refreshShop(); }
+async function saveCreds() {
+  try { await api('/api/admin/credentials', 'POST', { username: $('newUser').value.trim(), password: $('newPass').value }); $('newPass').value = ''; toast(t('saved')); }
+  catch (e) { if (e.message === 'weak') toast(t('newPass')); }
+}
+async function savePrices() {
+  const prices = {}; adminData.packages.forEach(p => prices[p.id] = Number($('price-' + p.id).value));
+  await api('/api/admin/prices', 'POST', { prices }); toast(t('saved')); await refreshShop();
+}
+async function setStatus(id, status) { await api(`/api/admin/orders/${id}/status`, 'POST', { status }); reloadAdmin(); }
+async function delOrder(id) { if (confirm(t('delConfirm'))) { await api('/api/admin/orders/' + id, 'DELETE'); reloadAdmin(); } }
+async function previewShot(id) {
+  if (LOCAL) { const r = await api('/api/admin/shot/' + id); $('previewImg').src = r.dataUrl; return openModal('imgModal'); }
+  const r = await fetch(API_URL + '/api/admin/shot/' + id, { headers: { 'x-admin-token': adminToken } });
+  if (!r.ok) return;
+  $('previewImg').src = URL.createObjectURL(await r.blob()); openModal('imgModal');
+}
+
+// ---------- Fon bölejikleri ----------
+(function () {
+  const c = $('bg-canvas'), x = c.getContext('2d'); let w, h;
+  const resize = () => { w = c.width = innerWidth; h = c.height = innerHeight; };
+  addEventListener('resize', resize); resize();
+  const ps = Array.from({ length: 40 }, () => ({ x: Math.random() * w, y: Math.random() * h, r: Math.random() * 2 + .8, sx: (Math.random() - .5) * .25, sy: (Math.random() - .5) * .25 }));
+  (function loop() {
+    x.clearRect(0, 0, w, h);
+    x.fillStyle = theme === 'dark' ? 'rgba(255,174,0,.25)' : 'rgba(2,132,199,.25)';
+    ps.forEach(p => { p.x += p.sx; p.y += p.sy; if (p.x < 0) p.x = w; if (p.x > w) p.x = 0; if (p.y < 0) p.y = h; if (p.y > h) p.y = 0; x.beginPath(); x.arc(p.x, p.y, p.r, 0, 7); x.fill(); });
+    requestAnimationFrame(loop);
+  })();
+})();
+
+// ---------- Başlangyç ----------
+(async function init() {
+  applyTheme(); $('cartCount').textContent = cart.length;
+  await refreshShop(); applyLang(); refreshBuyer();
+  const saved = sessionStorage.getItem('uc_admin');
+  if (saved) { adminToken = saved; closeModal('roleModal'); await enterAdmin(); }
+  else if (buyer) closeModal('roleModal');
+  setInterval(refreshShop, 20000);
+  setInterval(() => { if (buyer && !adminToken) refreshBuyer(); }, 15000);
+  setInterval(() => { if (adminToken) reloadAdmin().catch(() => {}); }, 10000);
+})();
+
+</script>
+</body>
+</html>
